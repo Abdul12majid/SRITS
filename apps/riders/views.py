@@ -5,6 +5,16 @@ from rest_framework import status
 from .models import Rider
 from .serializers import RiderSerializer
 
+def get_rider(pk):
+    try:
+        return Rider.objects.select_related(
+            "next_of_kin",
+            "motorcycle"
+        ).get(pk=pk)
+    except Rider.DoesNotExist:
+        return None
+
+
 @api_view(["POST"])
 def register_rider(request):
     serializer = RiderSerializer(data=request.data)
@@ -23,16 +33,57 @@ def rider_list(request):
 
     return Response(serializer.data)
 
+
 @api_view(["GET"])
 def rider_detail(request, pk):
-    try:
-        rider = Rider.objects.get(pk=pk)
-    except Rider.DoesNotExist:
+    rider = get_rider(pk)
+
+    if rider is None:
         return Response(
             {"error": "Rider not found"},
-            status=status.HTTP_404_NOT_FOUND,
+            status=status.HTTP_404_NOT_FOUND
         )
 
     serializer = RiderSerializer(rider)
-
     return Response(serializer.data)
+
+
+@api_view(["PUT", "PATCH"])
+def update_rider(request, pk):
+    rider = get_rider(pk)
+
+    if rider is None:
+        return Response(
+            {"error": "Rider not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serializer = RiderSerializer(
+        rider,
+        data=request.data,
+        partial=request.method == "PATCH"
+    )
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["DELETE"])
+def delete_rider(request, pk):
+    rider = get_rider(pk)
+
+    if rider is None:
+        return Response(
+            {"error": "Rider not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    rider.delete()
+
+    return Response(
+        {"message": "Rider deleted successfully"},
+        status=status.HTTP_204_NO_CONTENT
+    )

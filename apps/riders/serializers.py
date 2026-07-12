@@ -39,3 +39,30 @@ class RiderSerializer(serializers.ModelSerializer):
         )
 
         return rider
+
+    def update(self, instance, validated_data):
+        next_of_kin_data = validated_data.pop("next_of_kin", None)
+        motorcycle_data = validated_data.pop("motorcycle", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        if next_of_kin_data:
+            next_of_kin = instance.next_of_kin
+
+            for attr, value in next_of_kin_data.items():
+                setattr(next_of_kin, attr, value)
+
+            next_of_kin.save()
+
+        if motorcycle_data:
+            motorcycle = instance.motorcycle
+
+            for attr, value in motorcycle_data.items():
+                setattr(motorcycle, attr, value)
+
+            motorcycle.save()
+
+        return instance
