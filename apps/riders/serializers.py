@@ -66,3 +66,35 @@ class RiderSerializer(serializers.ModelSerializer):
             motorcycle.save()
 
         return instance
+
+    def validate_nin(self, value):
+        value = value.strip()
+
+        if not value.isdigit():
+            raise serializers.ValidationError("NIN must contain only numbers.")
+
+        if len(value) != 11:
+            raise serializers.ValidationError("NIN must be exactly 11 digits.")
+
+        return value
+
+
+    def validate_phone_number(self, value):
+        value = value.strip()
+
+        if not value.isdigit():
+            raise serializers.ValidationError("Phone number must contain only numbers.")
+
+        if len(value) != 11:
+            raise serializers.ValidationError("Phone number must be exactly 11 digits.")
+
+        return value
+
+
+    def validate_date_of_birth(self, value):
+        if value > date.today():
+            raise serializers.ValidationError(
+                "Date of birth cannot be in the future."
+            )
+
+        return value
