@@ -21,12 +21,14 @@ class Rider(BaseModel):
 
     phone_number = models.CharField(
         max_length=15,
-        unique=True
+        unique=True,
+        db_index=True
     )
 
     nin = models.CharField(
         max_length=11,
-        unique=True
+        unique=True,
+        db_index=True
     )
 
     address = models.TextField()
@@ -65,7 +67,8 @@ class Motorcycle(BaseModel):
 
     plate_number = models.CharField(
         max_length=20,
-        unique=True
+        unique=True,
+        db_index=True
     )
 
     chassis_number = models.CharField(

@@ -4,6 +4,7 @@ from rest_framework import status
 
 from .models import Rider
 from .serializers import RiderSerializer
+from django.db.models import Q
 
 def get_rider(pk):
     try:
@@ -28,10 +29,40 @@ def register_rider(request):
 
 @api_view(["GET"])
 def rider_list(request):
-    riders = Rider.objects.all().order_by("-id")
-    serializer = RiderSerializer(riders, many=True)
+    search = request.GET.get("search", "")
+    page = int(request.GET.get("page", 1))
+    page_size = 20
 
-    return Response(serializer.data)
+    riders = Rider.objects.select_related(
+        "next_of_kin",
+        "motorcycle"
+    )
+
+    if search:
+        riders = riders.filter(
+            Q(first_name__icontains=search) |
+            Q(last_name__icontains=search) |
+            Q(phone_number__icontains=search) |
+            Q(nin__icontains=search) |
+            Q(motorcycle__plate_number__icontains=search)
+        )
+
+    total = riders.count()
+
+    start = (page - 1) * page_size
+    end = start + page_size
+
+    serializer = RiderSerializer(
+        riders[start:end],
+        many=True
+    )
+
+    return Response({
+        "count": total,
+        "page": page,
+        "page_size": page_size,
+        "results": serializer.data
+    })
 
 
 @api_view(["GET"])
@@ -87,3 +118,5 @@ def delete_rider(request, pk):
         {"message": "Rider deleted successfully"},
         status=status.HTTP_204_NO_CONTENT
     )
+
+

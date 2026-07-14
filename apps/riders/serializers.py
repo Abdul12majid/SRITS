@@ -13,6 +13,9 @@ class MotorcycleSerializer(serializers.ModelSerializer):
         model = Motorcycle
         exclude = ("rider",)
 
+    def validate_plate_number(self, value):
+        return value.strip().upper()
+
 
 class RiderSerializer(serializers.ModelSerializer):
     next_of_kin = NextOfKinSerializer()
