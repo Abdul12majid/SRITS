@@ -7,7 +7,15 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import LoginSerializer
 from rest_framework.permissions import IsAuthenticated
-from .serializers import LoginSerializer, LogoutSerializer
+from .serializers import LoginSerializer, LogoutSerializer, UserSerializer
+
+
+
+@api_view(["GET"])
+def me(request):
+    serializer = UserSerializer(request.user)
+
+    return Response(serializer.data)
 
 
 @api_view(["POST"])
