@@ -30,6 +30,18 @@ class Rider(BaseModel):
         unique=True,
         db_index=True
     )
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("suspended", "Suspended"),
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+        db_index=True,
+    )
 
     address = models.TextField()
 
