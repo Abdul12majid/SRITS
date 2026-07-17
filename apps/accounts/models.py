@@ -1,5 +1,22 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from datetime import timedelta
+from django.utils import timezone
+import random
+from apps.common.models import BaseModel
+
+class OTP(BaseModel):
+    phone_number = models.CharField(max_length=15)
+    otp = models.CharField(max_length=6)
+    is_used = models.BooleanField(default=False)
+    expires_at = models.DateTimeField()
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    @staticmethod
+    def generate():
+        return str(random.randint(100000, 999999))
 
 
 class UserManager(BaseUserManager):
@@ -62,7 +79,7 @@ class User(AbstractUser):
         choices=Roles.choices,
         default=Roles.RIDER,
     )
-    
+
     is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = "phone_number"

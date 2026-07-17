@@ -1,10 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-
 from .models import Rider
 from .serializers import RiderSerializer
 from django.db.models import Q
+from apps.accounts.permissions import role_required
 
 def get_rider(pk):
     try:
@@ -17,6 +17,7 @@ def get_rider(pk):
 
 
 @api_view(["POST"])
+@role_required(["SUPER_ADMIN", "REGISTRATION_OFFICER"])
 def register_rider(request):
     serializer = RiderSerializer(data=request.data)
 
