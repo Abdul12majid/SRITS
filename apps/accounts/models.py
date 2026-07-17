@@ -62,6 +62,8 @@ class User(AbstractUser):
         choices=Roles.choices,
         default=Roles.RIDER,
     )
+    
+    is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = "phone_number"
 
