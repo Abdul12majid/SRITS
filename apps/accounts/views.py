@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import LoginSerializer
+from rest_framework.permissions import IsAuthenticated
+from .serializers import LoginSerializer, LogoutSerializer
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -48,3 +51,31 @@ def login(request):
             },
         }
     )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    serializer = LogoutSerializer(data=request.data)
+
+    if not serializer.is_valid():
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        token = RefreshToken(serializer.validated_data["refresh"])
+        token.blacklist()
+
+        return Response({
+            "message": "Logged out successfully."
+        })
+
+    except Exception:
+        return Response(
+            {
+                "error": "Invalid refresh token."
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
