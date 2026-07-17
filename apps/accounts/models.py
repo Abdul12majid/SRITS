@@ -5,19 +5,6 @@ from django.utils import timezone
 import random
 from apps.common.models import BaseModel
 
-class OTP(BaseModel):
-    phone_number = models.CharField(max_length=15)
-    otp = models.CharField(max_length=6)
-    is_used = models.BooleanField(default=False)
-    expires_at = models.DateTimeField()
-
-    def is_expired(self):
-        return timezone.now() > self.expires_at
-
-    @staticmethod
-    def generate():
-        return str(random.randint(100000, 999999))
-
 
 class UserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
@@ -90,3 +77,17 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class OTP(BaseModel):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="otps",)
+    otp = models.CharField(max_length=6)
+    is_used = models.BooleanField(default=False)
+    expires_at = models.DateTimeField()
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    @staticmethod
+    def generate():
+        return str(random.randint(100000, 999999))

@@ -5,4 +5,7 @@ urlpatterns = [
     path("login/", views.login),
     path("logout/", views.logout),
     path("me/", views.me),
+    path("request-otp/", views.request_otp),
+    path("verify-otp/", views.verify_otp),
+    path("reset-password/", views.reset_password),
 ]
