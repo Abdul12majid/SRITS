@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.riders",
     "apps.motorcycles",
+    "apps.documents",
 ]
 
 MIDDLEWARE = [

@@ -80,7 +80,7 @@ class User(AbstractUser):
 
 
 class OTP(BaseModel):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="otps",)
+    phone_number = models.CharField(max_length=15)
     otp = models.CharField(max_length=6)
     is_used = models.BooleanField(default=False)
     expires_at = models.DateTimeField()
