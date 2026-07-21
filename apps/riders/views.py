@@ -143,6 +143,14 @@ def upload_rider_photo(request, rider_id):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    # Delete old photo if it exists
+    if rider.photo:
+        old_photo_path = os.path.join(settings.MEDIA_ROOT, rider.photo.name)
+
+        if os.path.isfile(old_photo_path):
+            os.remove(old_photo_path)
+
+    # Save the new photo
     rider.photo = request.FILES["photo"]
     rider.save()
 
