@@ -5,6 +5,8 @@ from .models import Rider
 from .serializers import RiderSerializer
 from django.db.models import Q
 from apps.accounts.permissions import role_required
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 def get_rider(pk):
     try:
@@ -121,3 +123,57 @@ def delete_rider(request, pk):
     )
 
 
+
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def upload_rider_photo(request, rider_id):
+    try:
+        rider = Rider.objects.get(id=rider_id)
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if "photo" not in request.FILES:
+        return Response(
+            {"detail": "No photo uploaded."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    rider.photo = request.FILES["photo"]
+    rider.save()
+
+    return Response(
+        {
+            "message": "Photo uploaded successfully.",
+            "photo": rider.photo.url,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def rider_photo(request, rider_id):
+    try:
+        rider = Rider.objects.get(id=rider_id)
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if not rider.photo:
+        return Response(
+            {"detail": "No photo available."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    return Response(
+        {
+            "photo": rider.photo.url
+        }
+    )

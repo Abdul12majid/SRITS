@@ -30,6 +30,13 @@ class Rider(BaseModel):
         unique=True,
         db_index=True
     )
+
+    photo = models.ImageField(
+        upload_to="rider_photos/",
+        null=True,
+        blank=True,
+    )
+    
     STATUS_CHOICES = (
         ("pending", "Pending"),
         ("approved", "Approved"),
