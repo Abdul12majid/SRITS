@@ -50,6 +50,34 @@ class Rider(BaseModel):
         default="PENDING",
     )
 
+    rider_id = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True,
+    )
+
+    CARD_STATUS_CHOICES = (
+        ("ACTIVE", "Active"),
+        ("SUSPENDED", "Suspended"),
+        ("EXPIRED", "Expired"),
+    )
+
+    card_status = models.CharField(
+        max_length=10,
+        choices=CARD_STATUS_CHOICES,
+        default="ACTIVE",
+    )
+
+    registration_date = models.DateField(
+        auto_now_add=True,
+    )
+
+    qr_code = models.ImageField(
+        upload_to="qr_codes/",
+        null=True,
+        blank=True,
+    )
+
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
