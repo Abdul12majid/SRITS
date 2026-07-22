@@ -7,6 +7,7 @@ from django.db.models import Q
 from apps.accounts.permissions import role_required
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 
 def get_rider(pk):
     try:
@@ -185,3 +186,67 @@ def rider_photo(request, rider_id):
             "photo": rider.photo.url
         }
     )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def approve_rider(request, rider_id):
+    try:
+        rider = Rider.objects.get(id=rider_id)
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if rider.status == "APPROVED":
+        return Response(
+            {"detail": "Rider is already approved."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    rider.status = "APPROVED"
+    rider.approved_by = request.user
+    rider.approved_at = timezone.now()
+    rider.save()
+
+    return Response({
+        "message": "Rider approved successfully."
+    })
+
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def reject_rider(request, rider_id):
+    try:
+        rider = Rider.objects.get(id=rider_id)
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    rider.status = "REJECTED"
+    rider.approved_by = request.user
+    rider.approved_at = timezone.now()
+    rider.save()
+
+    return Response({
+        "message": "Rider rejected successfully."
+    })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def pending_riders(request):
+    riders = Rider.objects.filter(
+        status="PENDING"
+    ).order_by("-created_at")
+
+    serializer = RiderSerializer(
+        riders,
+        many=True
+    )
+
+    return Response(serializer.data)

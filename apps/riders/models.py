@@ -1,5 +1,6 @@
 from django.db import models
 from apps.common.models import BaseModel
+from django.conf import settings
 
 
 class Rider(BaseModel):
@@ -36,20 +37,33 @@ class Rider(BaseModel):
         null=True,
         blank=True,
     )
-    
+
     STATUS_CHOICES = (
-        ("pending", "Pending"),
-        ("approved", "Approved"),
-        ("suspended", "Suspended"),
+        ("PENDING", "Pending"),
+        ("APPROVED", "Approved"),
+        ("REJECTED", "Rejected"),
     )
 
     status = models.CharField(
-        max_length=20,
+        max_length=10,
         choices=STATUS_CHOICES,
-        default="pending",
-        db_index=True,
+        default="PENDING",
     )
 
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_riders",
+    )
+
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    
     address = models.TextField()
 
     state_of_origin = models.CharField(max_length=100)

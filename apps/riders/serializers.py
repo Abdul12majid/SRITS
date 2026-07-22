@@ -24,6 +24,11 @@ class RiderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rider
         fields = "__all__"
+        read_only_fields = (
+            "status",
+            "approved_by",
+            "approved_at",
+        )
 
     def create(self, validated_data):
         next_of_kin_data = validated_data.pop("next_of_kin")
@@ -81,7 +86,6 @@ class RiderSerializer(serializers.ModelSerializer):
 
         return value
 
-
     def validate_phone_number(self, value):
         value = value.strip()
 
@@ -92,7 +96,6 @@ class RiderSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Phone number must be exactly 11 digits.")
 
         return value
-
 
     def validate_date_of_birth(self, value):
         if value > date.today():
