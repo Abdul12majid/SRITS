@@ -213,10 +213,13 @@ def approve_rider(request, rider_id):
         rider.approved_at = timezone.now()
         if not rider.rider_id:
             rider.rider_id = generate_rider_id()
+            
         if not rider.registration_date:
             rider.registration_date = timezone.now().date()
 
         rider.card_status = "ACTIVE"
+
+        generate_qr_code(rider)
 
         rider.save()
 
