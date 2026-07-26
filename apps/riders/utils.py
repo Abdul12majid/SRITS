@@ -1,13 +1,16 @@
 from datetime import datetime
-
+from django.db import transaction
 from .models import Rider
 
 
+@transaction.atomic
 def generate_rider_id():
     year = datetime.now().year
 
     last_rider = (
-        Rider.objects.exclude(rider_id__isnull=True)
+        Rider.objects
+        .select_for_update()
+        .exclude(rider_id__isnull=True)
         .exclude(rider_id="")
         .filter(rider_id__startswith=f"SRITS-{year}-")
         .order_by("-rider_id")
