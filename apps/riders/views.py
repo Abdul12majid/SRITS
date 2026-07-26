@@ -8,6 +8,7 @@ from apps.accounts.permissions import role_required
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from .utils import generate_rider_id
 
 def get_rider(pk):
     try:
@@ -205,15 +206,24 @@ def approve_rider(request, rider_id):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    
     rider.status = "APPROVED"
     rider.approved_by = request.user
     rider.approved_at = timezone.now()
+
+    if not rider.rider_id:
+        rider.rider_id = generate_rider_id()
+
+    if not rider.registration_date:
+        rider.registration_date = timezone.now().date()
+
+    rider.card_status = "ACTIVE"
+
     rider.save()
 
     return Response({
         "message": "Rider approved successfully."
     })
-
 
 
 @api_view(["POST"])
