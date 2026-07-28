@@ -104,3 +104,16 @@ class RiderSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+
+class RiderVerificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rider
+        fields = (
+            "rider_id",
+            "first_name",
+            "last_name",
+            "photo",
+            "registration_date",
+            "card_status",
+        )

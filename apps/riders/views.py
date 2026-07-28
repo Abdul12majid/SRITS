@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from .utils import generate_rider_id
 from django.db import transaction
+from .serializers import RiderVerificationSerializer
 
 def get_rider(pk):
     try:
@@ -125,10 +126,6 @@ def delete_rider(request, pk):
         status=status.HTTP_204_NO_CONTENT
     )
 
-
-
-
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def upload_rider_photo(request, rider_id):
@@ -165,7 +162,6 @@ def upload_rider_photo(request, rider_id):
         status=status.HTTP_200_OK,
     )
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def rider_photo(request, rider_id):
@@ -188,7 +184,6 @@ def rider_photo(request, rider_id):
             "photo": rider.photo.url
         }
     )
-
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -233,7 +228,6 @@ def approve_rider(request, rider_id):
         status=status.HTTP_200_OK,
     )
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def reject_rider(request, rider_id):
@@ -254,7 +248,6 @@ def reject_rider(request, rider_id):
         "message": "Rider rejected successfully."
     })
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def pending_riders(request):
@@ -266,5 +259,23 @@ def pending_riders(request):
         riders,
         many=True
     )
+
+    return Response(serializer.data)
+
+@api_view(["GET"])
+@permission_classes([])
+def verify_rider(request, rider_id):
+    try:
+        rider = Rider.objects.get(
+            rider_id=rider_id,
+            status="APPROVED",
+        )
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Invalid Rider ID."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    serializer = RiderVerificationSerializer(rider)
 
     return Response(serializer.data)
