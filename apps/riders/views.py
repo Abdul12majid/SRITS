@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Rider
-from .serializers import RiderSerializer
+from .serializers import RiderVerificationSerializer, RiderIdentityCardSerializer, RiderSerializer
 from django.db.models import Q
 from apps.accounts.permissions import role_required
 from rest_framework.decorators import api_view, permission_classes
@@ -10,7 +10,6 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from .utils import generate_rider_id
 from django.db import transaction
-from .serializers import RiderVerificationSerializer
 
 def get_rider(pk):
     try:
@@ -277,5 +276,24 @@ def verify_rider(request, rider_id):
         )
 
     serializer = RiderVerificationSerializer(rider)
+
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def rider_identity_card(request, rider_id):
+    try:
+        rider = Rider.objects.get(
+            id=rider_id,
+            status="APPROVED",
+        )
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    serializer = RiderIdentityCardSerializer(rider)
 
     return Response(serializer.data)

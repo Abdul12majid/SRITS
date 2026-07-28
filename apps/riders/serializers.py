@@ -117,3 +117,26 @@ class RiderVerificationSerializer(serializers.ModelSerializer):
             "registration_date",
             "card_status",
         )
+
+
+class RiderIdentityCardSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Rider
+        fields = (
+            "rider_id",
+            "full_name",
+            "photo",
+            "qr_code",
+            "registration_date",
+            "card_status",
+        )
+
+    def get_full_name(self, obj):
+        names = [
+            obj.first_name,
+            obj.middle_name,
+            obj.last_name,
+        ]
+        return " ".join(filter(None, names))
