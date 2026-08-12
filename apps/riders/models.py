@@ -100,7 +100,20 @@ class Rider(BaseModel):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+class RiderCheckIn(BaseModel):
+    rider = models.ForeignKey(
+        Rider,
+        on_delete=models.CASCADE,
+        related_name="check_ins"
+    )
+    check_in_time = models.DateTimeField()
+    check_out_time = models.DateTimeField(null=True, blank=True)
+    location = models.CharField(max_length=255)
+    park = models.CharField(max_length=255)
 
+    def __str__(self):
+        return f"{self.rider.rider_id} - {self.check_in_time}"
+        
 class NextOfKin(BaseModel):
     rider = models.OneToOneField(
         Rider,
