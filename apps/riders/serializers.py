@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Rider, NextOfKin, Motorcycle
+from .models import Rider, NextOfKin, Motorcycle, RiderCheckIn
 
 
 class NextOfKinSerializer(serializers.ModelSerializer):
@@ -140,3 +140,21 @@ class RiderIdentityCardSerializer(serializers.ModelSerializer):
             obj.last_name,
         ]
         return " ".join(filter(None, names))
+
+
+class RiderCheckInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RiderCheckIn
+        fields = (
+            "id",
+            "rider",
+            "check_in_time",
+            "check_out_time",
+            "location",
+            "park",
+        )
+        read_only_fields = (
+            "id",
+            "check_in_time",
+            "check_out_time",
+        )

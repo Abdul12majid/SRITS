@@ -14,4 +14,5 @@ urlpatterns = [
     path("<int:rider_id>/reject/", views.reject_rider, name="reject-rider"),
     path("verify/<str:rider_id>/",views.verify_rider,name="verify-rider"),
     path("<int:rider_id>/identity-card/", views.rider_identity_card, name="rider-identity-card"),
+    path("check-in/", views.rider_check_in, name="rider-check-in"),
 ]

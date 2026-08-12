@@ -297,3 +297,65 @@ def rider_identity_card(request, rider_id):
     serializer = RiderIdentityCardSerializer(rider)
 
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def rider_check_in(request):
+    rider_id = request.data.get("rider")
+    location = request.data.get("location")
+    park = request.data.get("park")
+
+    if not rider_id:
+        return Response(
+            {"detail": "Rider is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not location:
+        return Response(
+            {"detail": "Location is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not park:
+        return Response(
+            {"detail": "Park is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        rider = Rider.objects.get(
+            id=rider_id,
+            status="APPROVED",
+        )
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Approved rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    active_check_in = RiderCheckIn.objects.filter(
+        rider=rider,
+        check_out_time__isnull=True,
+    ).first()
+
+    if active_check_in:
+        return Response(
+            {"detail": "Rider is already checked in."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    check_in = RiderCheckIn.objects.create(
+        rider=rider,
+        check_in_time=timezone.now(),
+        location=location,
+        park=park,
+    )
+
+    serializer = RiderCheckInSerializer(check_in)
+
+    return Response(
+        serializer.data,
+        status=status.HTTP_201_CREATED,
+    )
