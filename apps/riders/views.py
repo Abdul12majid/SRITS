@@ -359,3 +359,44 @@ def rider_check_in(request):
         serializer.data,
         status=status.HTTP_201_CREATED,
     )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def rider_check_out(request, rider_id):
+    try:
+        rider = Rider.objects.get(
+            id=rider_id,
+            status="APPROVED",
+        )
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Approved rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    check_in = (
+        RiderCheckIn.objects
+        .filter(
+            rider=rider,
+            check_out_time__isnull=True,
+        )
+        .order_by("-check_in_time")
+        .first()
+    )
+
+    if not check_in:
+        return Response(
+            {"detail": "Rider is not currently checked in."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    check_in.check_out_time = timezone.now()
+    check_in.save(update_fields=["check_out_time", "updated_at"])
+
+    serializer = RiderCheckInSerializer(check_in)
+
+    return Response(
+        serializer.data,
+        status=status.HTTP_200_OK,
+    )
