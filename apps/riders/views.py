@@ -400,3 +400,28 @@ def rider_check_out(request, rider_id):
         serializer.data,
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def rider_check_in_history(request, rider_id):
+    try:
+        rider = Rider.objects.get(id=rider_id)
+    except Rider.DoesNotExist:
+        return Response(
+            {"detail": "Rider not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    check_ins = (
+        RiderCheckIn.objects
+        .filter(rider=rider)
+        .order_by("-check_in_time")
+    )
+
+    serializer = RiderCheckInSerializer(
+        check_ins,
+        many=True,
+    )
+
+    return Response(serializer.data)
