@@ -130,7 +130,6 @@ class NextOfKin(BaseModel):
     def __str__(self):
         return self.name
 
-
 class Motorcycle(BaseModel):
     rider = models.OneToOneField(
         Rider,
@@ -160,3 +159,34 @@ class Motorcycle(BaseModel):
 
     def __str__(self):
         return self.plate_number
+
+
+class RiderIncident(BaseModel):
+    INCIDENT_STATUS_CHOICES = (
+        ("OPEN", "Open"),
+        ("UNDER_INVESTIGATION", "Under Investigation"),
+        ("CLOSED", "Closed"),
+    )
+
+    rider = models.ForeignKey(
+        Rider,
+        on_delete=models.CASCADE,
+        related_name="incidents",
+    )
+    incident_type = models.CharField(max_length=255)
+    description = models.TextField()
+    location = models.CharField(max_length=255)
+    incident_date = models.DateTimeField()
+    evidence = models.FileField(
+        upload_to="incident_evidence/",
+        null=True,
+        blank=True,
+    )
+    status = models.CharField(
+        max_length=25,
+        choices=INCIDENT_STATUS_CHOICES,
+        default="OPEN",
+    )
+
+    def __str__(self):
+        return f"{self.incident_type} - {self.rider.rider_id}"
