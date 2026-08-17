@@ -11,6 +11,7 @@ from django.utils import timezone
 from .utils import generate_rider_id
 from django.db import transaction
 
+
 def get_rider(pk):
     try:
         return Rider.objects.select_related(
@@ -425,3 +426,32 @@ def rider_check_in_history(request, rider_id):
     )
 
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_incident(request):
+    serializer = RiderIncidentSerializer(
+        data=request.data
+    )
+
+    if not serializer.is_valid():
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    rider = serializer.validated_data["rider"]
+
+    if rider.status != "APPROVED":
+        return Response(
+            {"detail": "Only approved riders can have incidents reported."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    incident = serializer.save()
+
+    return Response(
+        RiderIncidentSerializer(incident).data,
+        status=status.HTTP_201_CREATED,
+    )

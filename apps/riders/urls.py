@@ -16,5 +16,6 @@ urlpatterns = [
     path("<int:rider_id>/identity-card/", views.rider_identity_card, name="rider-identity-card"),
     path("check-in/", views.rider_check_in, name="rider-check-in"),
     path("check-out/<int:rider_id>/", views.rider_check_out, name="rider-check-out"),
-    path("check-in-history/<int:rider_id>/", views.rider_check_in_history, name="rider-check-in-history",),
+    path("check-in-history/<int:rider_id>/", views.rider_check_in_history, name="rider-check-in-history"),
+    path("incidents/create/", views.create_incident, name="create-incident"),
 ]

@@ -1,6 +1,27 @@
 from rest_framework import serializers
-from .models import Rider, NextOfKin, Motorcycle, RiderCheckIn
+from .models import Rider, NextOfKin, Motorcycle, RiderCheckIn, RiderIncident
 
+class RiderIncidentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RiderIncident
+        fields = (
+            "id",
+            "rider",
+            "incident_type",
+            "description",
+            "location",
+            "incident_date",
+            "evidence",
+            "status",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "status",
+            "created_at",
+            "updated_at",
+        )
 
 class NextOfKinSerializer(serializers.ModelSerializer):
     class Meta:
