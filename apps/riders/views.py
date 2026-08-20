@@ -483,4 +483,40 @@ def incident_detail(request, incident_id):
 
     serializer = RiderIncidentSerializer(incident)
 
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def update_incident_status(request, incident_id):
+    try:
+        incident = RiderIncident.objects.get(id=incident_id)
+    except RiderIncident.DoesNotExist:
+        return Response(
+            {"detail": "Incident not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    new_status = request.data.get("status")
+
+    allowed_statuses = [
+        "OPEN",
+        "UNDER_INVESTIGATION",
+        "CLOSED",
+    ]
+
+    if new_status not in allowed_statuses:
+        return Response(
+            {
+                "detail": "Invalid status.",
+                "allowed_statuses": allowed_statuses,
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    incident.status = new_status
+    incident.save(update_fields=["status", "updated_at"])
+
+    serializer = RiderIncidentSerializer(incident)
+
     return Response(serializer.data)    

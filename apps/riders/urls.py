@@ -20,4 +20,5 @@ urlpatterns = [
     path("incidents/create/", views.create_incident, name="create-incident"),
     path("incidents/", views.incident_list, name="incident-list"),
     path("incidents/<int:incident_id>/", views.incident_detail, name="incident-detail"),
+    path("incidents/<int:incident_id>/status/", views.update_incident_status, name="update-incident-status"),
 ]
