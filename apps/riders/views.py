@@ -455,3 +455,32 @@ def create_incident(request):
         RiderIncidentSerializer(incident).data,
         status=status.HTTP_201_CREATED,
     )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def incident_list(request):
+    incidents = RiderIncident.objects.all().order_by("-incident_date")
+
+    serializer = RiderIncidentSerializer(
+        incidents,
+        many=True,
+    )
+
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def incident_detail(request, incident_id):
+    try:
+        incident = RiderIncident.objects.get(id=incident_id)
+    except RiderIncident.DoesNotExist:
+        return Response(
+            {"detail": "Incident not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    serializer = RiderIncidentSerializer(incident)
+
+    return Response(serializer.data)    

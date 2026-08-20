@@ -18,4 +18,6 @@ urlpatterns = [
     path("check-out/<int:rider_id>/", views.rider_check_out, name="rider-check-out"),
     path("check-in-history/<int:rider_id>/", views.rider_check_in_history, name="rider-check-in-history"),
     path("incidents/create/", views.create_incident, name="create-incident"),
+    path("incidents/", views.incident_list, name="incident-list"),
+    path("incidents/<int:incident_id>/", views.incident_detail, name="incident-detail"),
 ]
